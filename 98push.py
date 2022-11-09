@@ -213,9 +213,17 @@ headers = {
     'Connection': 'keep-alive',
 }
 
+c_service = Service(executable_path)
+c_service.command_line_args()
+c_service.start()
+c_options = Options()
+# 无界面浏览器
+c_options.add_argument('--no-sandbox')
+c_options.add_argument('--headless')
+c_options.add_argument('--disable-gpu')
+browser = webdriver.Chrome(service=c_service, options=c_options)
 while True:
     try:
-        ## 这一段为非selenium方式获取，失败率较高，弃用
         # # 网站不要求js验
         # r = requests.get(url_sehua, headers=headers)
         # xml_content = etree.HTML(r.content)
@@ -227,25 +235,14 @@ while True:
         #     master(r.content)
         #     time.sleep(random.randint(14, 24))
         # else:
-
         # a = 1
         print("js验证")
-        # 修改为自己的chromedriver路径
-        # executable_path=r"/usr/local/bin/chromedriver"
-        c_service = Service(executable_path)
-        c_service.command_line_args()
-        c_service.start()
-        c_options = Options()
-        # 无界面浏览器
-        c_options.add_argument('--no-sandbox')
-        c_options.add_argument('--headless')
-        c_options.add_argument('--disable-gpu')
-        browser = webdriver.Chrome(service=c_service, options=c_options)
+        # 网址
         browser.get(url_sehua)
         master(browser.page_source)
-        browser.quit()
-        c_service.stop()
-        time.sleep(random.randint(15, 20))
+        # browser.quit()
+        # c_service.stop()
+        time.sleep(random.randint(20, 40))
     except Exception:
         print("网络错误，请稍后重试")
-        time.sleep(60)
+        time.sleep(random.randint(60, 90))
