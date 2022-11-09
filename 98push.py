@@ -200,6 +200,9 @@ def get_con():
             config["times"] = 20
         if not re.match(r'^\d+$', config["timed"]):
             config["timed"] = 40
+        if config["times"] >= config["timed"]:
+            config["times"] = 20
+            config["timed"] = 40
         return str(config["bottoken"]), str(config["pid"]),str(config["executable_path"]),int(config["times"]),int(config["timed"])
 
 
