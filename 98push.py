@@ -120,11 +120,13 @@ def master(r):
     # print(number)
     # 不用那么多数据
     tie_list2 = tie_list[-200:]
+    have_new = 0
     for i in range(len(number)):
         href_id = href_list[i].split("tid=", )[-1].split("&", )[0]
         if not re.match(r'^\d+$', href_id):
             continue
         if str(href_id) not in tie_list2:
+            have_new = 1
             tie_list.append(str(href_id))
             name = href[i].replace("\r\n", "")
             if name == "隐藏置顶帖":
@@ -155,7 +157,8 @@ def master(r):
             post(pid, text)
         else:
             pass
-    add_list(tie_list[-200:])
+    if have_new == 1:
+        add_list(tie_list[-200:])
 
 
 def get_list():
