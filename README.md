@@ -23,6 +23,7 @@ warning ！！！！
 
 3. 使用百度/谷歌搜索 “服务器名称” + 安装chrome和chromedriver，如 ubuntu20 安装chromedriver
     注意chrome和chromedriver都需要安装，教程基本都比较详细，本人不多赘述。
+    安装完chromedriver后把地址填入98.json
 
 4. 脚本需要在后台运行，所以需要使用screen 或者nohup
     墙裂推荐使用screen，安装、使用方法百度/谷歌，一般都是一行代码

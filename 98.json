@@ -1,4 +1,5 @@
 {
   "bottoken": "机器人token",
-  "pid": "-100后面跟你的频道id"
+  "pid": "-100后面跟你的频道id",
+  "executable_path":"你的chromedriver路径"
 }
