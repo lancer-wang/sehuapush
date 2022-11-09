@@ -196,11 +196,11 @@ def get_con():
         if config["bottoken"] == "机器人token" or config["pid"] == "-100后面跟你的频道id" or config["executable_path"] == "你的chromedriver路径":
             print("请填写配置文件")
             exit()
-        if not re.match(r'^\d+$', config["times"]):
+        if not re.match(r'^\d+$', str(config["times"])):
             config["times"] = 20
-        if not re.match(r'^\d+$', config["timed"]):
+        if not re.match(r'^\d+$', str(config["timed"])):
             config["timed"] = 40
-        if config["times"] >= config["timed"]:
+        if int(config["times"]) >= int(config["timed"]):
             config["times"] = 20
             config["timed"] = 40
         return str(config["bottoken"]), str(config["pid"]),str(config["executable_path"]),int(config["times"]),int(config["timed"])
