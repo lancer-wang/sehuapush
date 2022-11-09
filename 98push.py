@@ -125,7 +125,7 @@ def master(r):
         if not re.match(r'^\d+$', href_id):
             continue
         if str(href_id) not in tie_list2:
-            tie_list2.append(str(href_id))
+            tie_list.append(str(href_id))
             name = href[i].replace("\r\n", "")
             if name == "隐藏置顶帖":
                 print("这是啥东西")
@@ -155,7 +155,7 @@ def master(r):
             post(pid, text)
         else:
             pass
-    add_list(tie_list2[-200:])
+    add_list(tie_list[-200:])
 
 
 def get_list():
