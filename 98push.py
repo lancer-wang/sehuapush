@@ -118,12 +118,14 @@ def master(r):
     href_2 = xml_content.xpath('/html/body/div[6]/div[6]/div/div/div[4]/div[2]/form/table/tbody/tr/th/a[3]/text()')
     # print(author)
     # print(number)
+    # 不用那么多数据
+    tie_list2 = tie_list[-200:]
     for i in range(len(number)):
         href_id = href_list[i].split("tid=", )[-1].split("&", )[0]
         if not re.match(r'^\d+$', href_id):
             continue
-        if str(href_id) not in tie_list:
-            tie_list.append(str(href_id))
+        if str(href_id) not in tie_list2:
+            tie_list2.append(str(href_id))
             name = href[i].replace("\r\n", "")
             if name == "隐藏置顶帖":
                 print("这是啥东西")
@@ -153,7 +155,7 @@ def master(r):
             post(pid, text)
         else:
             pass
-    add_list(tie_list)
+    add_list(tie_list2[-200:])
 
 
 def get_list():
