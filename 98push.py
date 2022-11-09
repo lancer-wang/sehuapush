@@ -39,7 +39,7 @@ def get_content(web_url):
                     for j in info:
                         s = s + j
                     # 不展示全部内容，防止内容过长，严重影响体验
-                    return s.replace("\r\n", '').replace('\n', '').replace('\xa0', '').replace('\u200b', '')[0:80]
+                    return s.replace("\r\n", '').replace('\n', '').replace('\xa0', '').replace('\u200b', '')[0:60]
             except Exception as e:
                 print("网络原因，无法访问，请稍后再试...")
                 return "因权限原因，内容无法预览，请手动登陆查看！"
@@ -62,7 +62,7 @@ def get_content(web_url):
                     for j in info:
                         s = s + j
                     # 不展示全部内容，防止内容过长，严重影响体验
-                    return s.replace("\r\n", '').replace('\n', '').replace('\xa0', '').replace('\u200b', '')[0:80]
+                    return s.replace("\r\n", '').replace('\n', '').replace('\xa0', '').replace('\u200b', '')[0:60]
 
             except Exception as e:
                 print("网络原因，无法访问，请稍后再试...")
@@ -73,8 +73,8 @@ def mark_down(content):
     # 删除特殊符号，防止发生错误parse
     sign = ['&', '<', ".", '>', ' ', '?', '"', "'", '#', '%', '!', '@', '$', '^', '*', '(', ')', '-', '_', '+', '=',
             '~', '/', ',', ':', '’', '‘', '“', '”', '%', '^', '——', '{', '}', '*', '[', '、', ']', '`', '"', "'"]
-    content = content.strip()
     content = content.replace("\n", "")
+    content = content.strip()
     for k in sign:
         content = content.replace(k, "\\" + k)
     return content
