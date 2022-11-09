@@ -1,5 +1,7 @@
 {
   "bottoken": "机器人token",
   "pid": "-100后面跟你的频道id",
-  "executable_path":"你的chromedriver路径"
+  "executable_path":"你的chromedriver路径",
+  "times":"检查更新频率，单位为秒,填写数字,并去掉左右引号,错填不填使用默认值",
+  "timed":"同上,脚本会在times到timed之间检查一次是否有新帖"
 }

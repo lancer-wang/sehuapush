@@ -196,11 +196,16 @@ def get_con():
         if config["bottoken"] == "机器人token" or config["pid"] == "-100后面跟你的频道id" or config["executable_path"] == "你的chromedriver路径":
             print("请填写配置文件")
             exit()
-        return str(config["bottoken"]), str(config["pid"]),str(config["executable_path"])
+        if not re.match(r'^\d+$', config["times"]):
+            times = 20
+        if not re.match(r'^\d+$', config["timed"]):
+            timed = 40
+
+        return str(config["bottoken"]), str(config["pid"]),str(config["executable_path"]),int(times),int(timed)
 
 
 # 获取配置
-bottoken, pid ,executable_path= get_con()
+bottoken, pid ,executable_path,times,timed= get_con()
 # 获取已经发送的帖子列表
 tie_list = get_list()
 headers = {
@@ -242,7 +247,7 @@ while True:
         master(browser.page_source)
         # browser.quit()
         # c_service.stop()
-        time.sleep(random.randint(20, 40))
+        time.sleep(random.randint(times, timed))
     except Exception:
         print("网络错误，请稍后重试")
         time.sleep(random.randint(60, 90))
