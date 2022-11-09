@@ -17,6 +17,9 @@ from selenium.webdriver.chrome.service import Service
 # 以及把url_1 改为国内（服务器）可访问的镜像地址
 proxies = {} # 举例 proxies = {"http": "http://127.0.0.1:123456"}
 url_1 = "https://www.sehuatang.net/"
+# 可以改为其他分区，自行获取链接
+url_sehua = url_1+"forum.php?mod=forumdisplay&fid=95&filter=author&orderby=dateline"
+
 def get_content(web_url):
     if a == 2:
         while True:
@@ -210,9 +213,6 @@ headers = {
     'Cache-Control': 'no-cache',
     'Connection': 'keep-alive',
 }
-# 可以改为其他镜像网站 或者其他分区，按这种格式写即可
-
-url_sehua = url_1+"forum.php?mod=forumdisplay&fid=95&filter=author&orderby=dateline"
 
 while True:
     try:
