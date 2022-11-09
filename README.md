@@ -38,6 +38,8 @@ warning ！！！！
 
 4. 分别把token和频道id放到98.json中
 
+5. （可选）填写times和timed，如20和40，脚本会在20到40秒之内检查一次更新，请勿填过小的数字
+
 5. python 98push.py
 
 进阶 
