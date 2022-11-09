@@ -197,11 +197,10 @@ def get_con():
             print("请填写配置文件")
             exit()
         if not re.match(r'^\d+$', config["times"]):
-            times = 20
+            config["times"] = 20
         if not re.match(r'^\d+$', config["timed"]):
-            timed = 40
-
-        return str(config["bottoken"]), str(config["pid"]),str(config["executable_path"]),int(times),int(timed)
+            config["timed"] = 40
+        return str(config["bottoken"]), str(config["pid"]),str(config["executable_path"]),int(config["times"]),int(config["timed"])
 
 
 # 获取配置
