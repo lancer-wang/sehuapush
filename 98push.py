@@ -18,7 +18,7 @@ from selenium.webdriver.chrome.service import Service
 proxies = {} # 举例 proxies = {"http": "http://127.0.0.1:123456"}
 url_1 = "https://www.sehuatang.net/"
 # 可以改为其他分区，自行获取链接
-url_sehua = url_1+"forum.php?mod=forumdisplay&fid=95&filter=author&orderby=dateline"
+# url_sehua = url_1+"forum.php?mod=forumdisplay&fid=95&filter=author&orderby=dateline"
 
 def get_content(web_url):
     ## 弃用非selenium方式
@@ -229,8 +229,17 @@ c_options.add_argument('--no-sandbox')
 c_options.add_argument('--headless')
 c_options.add_argument('--disable-gpu')
 browser = webdriver.Chrome(service=c_service, options=c_options)
+form_type = '1'
 while True:
     try:
+        if form_type == "1":
+            print("综合区")
+            url_sehua = url_1 + "forum.php?mod=forumdisplay&fid=95&filter=author&orderby=dateline"
+            form_type = "2"
+        else:
+            print("原创区")
+            url_sehua = url_1 + "forum.php?mod=forumdisplay&fid=141&filter=author&orderby=dateline"
+            form_type = "1"
         # # 网站不要求js验
         # r = requests.get(url_sehua, headers=headers)
         # xml_content = etree.HTML(r.content)
