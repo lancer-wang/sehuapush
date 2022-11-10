@@ -141,17 +141,15 @@ def master(r):
             else:
                 pass
             # 文章链接
-            # print(i)
-            k = i + 1
-            # print(k)
-            url_list = url_1+"{}".format(href_list[i])
+            url_list = url_1 + "thread-{}-1-1.html".format(str(href_id))
             # 作者id链接
-            url_author = url_1+"{}".format(author_url[k])
+            url_author = url_1 + "{}".format(author_url[i])
+            uid = author_url[i].split(".")[0].split("-")[-1]
             content_2 = mark_down(get_content(url_list))
             text = '\\[ 主        题 \\] ：' + "***{}***".format(
-                mark_down(name)) + '\n' + '\\[ 用        户 \\] ：[{0}]({1})'.format(
+                mark_down(name)) + '\n' + '[{0}] ：[{1}]({2})'.format(mark_down("#U"+uid),
                 mark_down(author[i]),
-                url_author) + '\n' + '\\[ 地        址 \\] ：[{0}]({1})'.format(str(href_id),
+                url_author) + '\n' + '\\[ 地        址 \\] ：[{0}]({1})'.format(str(url_list),
                                                                                url_list) + '\n' + '\\[ 内        容 ' \
                                                                                                   '\\]：[{}]'.format(
                 content_2)
