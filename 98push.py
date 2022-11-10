@@ -147,11 +147,11 @@ def master(r):
             uid = author_url[i].split(".")[0].split("-")[-1]
             content_2 = mark_down(get_content(url_list))
             text = '\\[ 主        题 \\] ：' + "***{}***".format(
-                mark_down(name)) + '\n' + '[{0}] ：[{1}]({2})'.format(mark_down("#U"+uid),
+                mark_down(name)) + '\n' + '[{0}]  ：[{1}]({2})'.format(mark_down("#U"+uid),
                 mark_down(author[i]),
-                url_author) + '\n' + '\\[ 地        址 \\] ：[{0}]({1})'.format(str(url_list),
+                url_author) + '\n' + '\\[ 地        址 \\] ：[{0}]({1})'.format(str(href_id),
                                                                                url_list) + '\n' + '\\[ 内        容 ' \
-                                                                                                  '\\]：[{}]'.format(
+                                                                                                  '\\] ：[{}]'.format(
                 content_2)
             # print(text)
             post(pid, text)
