@@ -121,7 +121,7 @@ def master(r):
     # print(author)
     # print(number)
     # 不用那么多数据
-    tie_list2 = tie_list[-200:]
+    tie_list2 = tie_list[-300:]
     have_new = 0
     for i in range(len(number)):
         href_id = href_list[i].split("tid=", )[-1].split("&", )[0]
@@ -158,7 +158,7 @@ def master(r):
         else:
             pass
     if have_new == 1:
-        add_list(tie_list[-200:])
+        add_list(tie_list[-300:])
 
 
 def get_list():
