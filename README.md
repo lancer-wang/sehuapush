@@ -1,5 +1,5 @@
-# 98push
-98堂的新帖推送
+# sehuapush
+sehua堂的新帖推送
 
 推荐使用Ubuntu20，因为我用的是ubuntu20，我个人使用是没有问题的
 
