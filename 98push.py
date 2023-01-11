@@ -79,7 +79,7 @@ def mark_down(content):
         content = content.replace(k, "\\" + k)
     return content
 def mark_down2(content):
-    content = content.strip().replace("\n", "").replace("\\", "").replace('"', "'")
+    content = content.strip().replace("\n", "").replace('"', "'")
     return content
 
 def post(chat_id: str, text: str, silent: bool = False, num=0):
