@@ -2,7 +2,7 @@
 # 自行百度安装chrome和chromedriver
 # 配置文件中分别添加机器人的bot token（从bot father获取）和 频道id（格式为-100 后面跟频道信息中的id）
 # 注意修改底部的chromedriver路径
-import json
+import json,sqlite3
 import os
 import random
 import re
@@ -62,7 +62,8 @@ def get_content(web_url):
                 for j in info:
                     s = s + j
                 # 不展示全部内容，防止内容过长，严重影响体验
-                return s.replace("\r\n", '').replace('\n', '').replace('\xa0', '').replace('\u200b', '')[0:60]
+                content = s.replace("\r\n", '').replace('\n', '').replace('\xa0', '').replace('\u200b', '')
+                return content[0:60],content[0:200]
         except Exception as e:
             print("网络原因，无法访问，请稍后再试...")
             return "因权限原因，内容无法预览，请手动登陆查看！"
@@ -77,7 +78,9 @@ def mark_down(content):
     for k in sign:
         content = content.replace(k, "\\" + k)
     return content
-
+def mark_down2(content):
+    content = content.strip().replace("\n", "").replace("\\", "")
+    return content
 
 def post(chat_id: str, text: str, silent: bool = False, num=0):
     try:
@@ -145,21 +148,54 @@ def master(r):
             # 作者id链接
             url_author = url_1 + "{}".format(author_url[i])
             uid = author_url[i].split(".")[0].split("-")[-1]
-            content_2 = mark_down(get_content(url_list))
+            content_2, content_3 = get_content(url_list)
             text = '\\[ 主        题 \\] ：' + "***{}***".format(
                 mark_down(name)) + '\n' + '[{0}]        [{1}]({2})'.format(mark_down("#U"+uid),
                 mark_down(author[i]),
                 url_author) + '\n' + '\\[ 地        址 \\] ：[{0}]({1})'.format(str(href_id),
                                                                                url_list) + '\n' + '\\[ 内        容 ' \
                                                                                                   '\\] ：[{}]'.format(
-                content_2)
+                mark_down(content_2))
             # print(text)
             post(pid, text)
+            try:
+                insert_db2(mark_down2(author[i]), url_list, mark_down2(name), mark_down2(content_3))
+            except:
+                print("插入失败")
+                pass
         else:
             pass
     if have_new == 1:
         add_list(tie_list[-300:])
 
+## 新增添加到数据库
+def get_db3():
+    if not os.path.exists("sehua.db"):
+        con = sqlite3.connect("sehua.db")
+        cur = con.cursor()
+        sql = """CREATE TABLE IF NOT EXISTS `sehua_new`  (
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `uname` varchar(255)  NULL DEFAULT NULL,
+  `surl` varchar(255)  NULL DEFAULT NULL,
+  `title` varchar(255)  NULL DEFAULT NULL,
+  `cont` text  NULL,
+  `create_at` varchar(255)  NULL DEFAULT NULL
+)"""
+        cur.execute(sql)
+        cur.close()
+        con.close()
+    con2 = sqlite3.connect("sehua.db")
+    return con2
+def insert_db2(uname, surl, title, cont):
+    db = get_db3()
+    cursor = db.cursor()
+    create_at = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    insert_sql = """insert into sehua_new(uname, surl, title, cont, create_at) VALUES ("{0}","{1}","{2}","{3}","{4}")""".format(uname, surl, title, cont, create_at)
+    cursor.execute(insert_sql)
+    db.commit()
+    cursor.close()
+    db.close()
+    print("数据添加成功")
 
 def get_list():
     if not os.path.exists("./tielist.json"):
