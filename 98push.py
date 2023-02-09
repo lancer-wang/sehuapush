@@ -17,6 +17,7 @@ from selenium.webdriver.chrome.service import Service
 # 以及把url_1 改为国内（服务器）可访问的镜像地址
 proxies = {} # 举例 proxies = {"http": "http://127.0.0.1:123456"}
 url_1 = "https://www.sehuatang.net/"
+
 # 可以改为其他分区或者多个分区，仿造底部格式更改即可
 
 
