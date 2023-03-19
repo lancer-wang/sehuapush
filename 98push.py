@@ -13,6 +13,7 @@ from lxml import etree
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
 # 国内vps 需使用代理进行推送
 # 以及把url_1 改为国内（服务器）可访问的镜像地址
 proxies = {} # 举例 proxies = {"http": "http://127.0.0.1:123456"}
@@ -264,6 +265,10 @@ c_options.add_argument('--no-sandbox')
 c_options.add_argument('--headless')
 c_options.add_argument('--disable-gpu')
 browser = webdriver.Chrome(service=c_service, options=c_options)
+# 网站的验证
+browser.get(url_1)
+time.sleep(5)
+browser.find_element(By.XPATH,'/html/body/a[1]').click()
 form_type = '1'
 while True:
     try:
