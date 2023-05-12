@@ -115,6 +115,8 @@ def post(chat_id: str, text: str, silent: bool = False, num=0):
 
 # 主程序
 def master(r):
+    global nums 
+    global mianfan_url
     xml_content = etree.HTML(r)
     href_list = xml_content.xpath('/html/body/div[6]/div[6]/div/div/div[4]/div[2]/form/table/tbody/tr/th/a[2]/@href')
     author = xml_content.xpath('/html/body/div[6]/div[6]/div/div/div[4]/div[2]/form/table/tbody/tr/td[2]/cite/a/text()')
@@ -129,6 +131,10 @@ def master(r):
     tie_list2 = tie_list[-300:]
     have_new = 0
     for i in range(len(number)):
+        nums +=1
+        if nums >= 1000:
+            mianfan_url = get_mianfan()
+            nums = 0
         href_id = href_list[i].split("tid=", )[-1].split("&", )[0]
         if not re.match(r'^\d+$', href_id):
             continue
@@ -151,11 +157,13 @@ def master(r):
             url_author = url_1 + "{}".format(author_url[i])
             uid = author_url[i].split(".")[0].split("-")[-1]
             content_2, content_3 = get_content(url_list)
+            mian_url = url_list.replace("https://www.sehuatang.net",mianfan_url)
+            
             text = '\\[ 主        题 \\] ：' + "***{}***".format(
-                mark_down(name)) + '\n' + '[{0}]        [{1}]({2})'.format(mark_down("#U"+uid),
+                mark_down(name)) + '\n' + '[{0}]       [{1}]({2})'.format(mark_down("#U"+uid),
                 mark_down(author[i]),
-                url_author) + '\n' + '\\[ 地        址 \\] ：[{0}]({1})'.format(str(href_id),
-                                                                               url_list) + '\n' + '\\[ 内        容 ' \
+                url_author) + '\n' + '\\[ 地        址 \\] ：[{0}]({1})----[{2}]({3})'.format(str(href_id),
+                                                                               url_list,"免翻地址",mian_url) + '\n' + '\\[ 内        容 ' \
                                                                                                   '\\] ：[{}]'.format(
                 mark_down(content_2))
             # print(text)
@@ -265,6 +273,21 @@ c_options.add_argument('--no-sandbox')
 c_options.add_argument('--headless')
 c_options.add_argument('--disable-gpu')
 browser = webdriver.Chrome(service=c_service, options=c_options)
+
+def get_mianfan():
+    link = "https://nux4n.cn/config.js"
+    browser.get(link)
+    # print(f.text)
+    pattern = r"home_url\s*=\s*'([^']+)'"
+    match = re.search(pattern, browser.page_source)
+    if match:
+        home_url = match.group(1)
+        return home_url
+    else:
+        return "https://www.dkxs12.com"
+nums = 0
+mianfan_url = get_mianfan()
+
 # 网站的验证
 browser.get(url_1)
 time.sleep(5)
