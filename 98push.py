@@ -162,7 +162,7 @@ def master(r):
             text = '\\[ 主        题 \\] ：' + "***{}***".format(
                 mark_down(name)) + '\n' + '[{0}]       [{1}]({2})'.format(mark_down("#U"+uid),
                 mark_down(author[i]),
-                url_author) + '\n' + '\\[ 地        址 \\] ：[{0}]({1})----[{2}]({3})'.format(str(href_id),
+                url_author) + '\n' + '\\[ 地        址 \\] ：[{0}]({1})       [{2}]({3})'.format(str(href_id),
                                                                                url_list,"免翻地址",mian_url) + '\n' + '\\[ 内        容 ' \
                                                                                                   '\\] ：[{}]'.format(
                 mark_down(content_2))
