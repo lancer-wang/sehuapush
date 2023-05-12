@@ -3,6 +3,8 @@ sehua堂的新帖推送
 
 update：新增了持久化，存到sqlite3，有需要的下载根目录下的sehua.db自行查看
 
+2023-5-12 ： 新增自动获取免翻地址
+
 推荐使用Ubuntu20，因为我用的是ubuntu20，我个人使用是没有问题的
 
 warning ！！！！
