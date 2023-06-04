@@ -22,59 +22,80 @@ url_1 = "https://www.sehuatang.net/"
 # 可以改为其他分区或者多个分区，仿造底部格式更改即可
 
 
-def get_content(web_url):
-    ## 弃用非selenium方式
-    # if a == 2:
-    #     while True:
-    #         try:
-    #             s = requests.get(web_url)
-    #             # hostloc_content = etree.HTML(s.content).xpath('//td[@class="t_f"]/text()')
-    #             hostloc_content = etree.HTML(s.content).xpath('//td[@class="t_f"]')[0]
+def get_content(web_url,url_type=1):
+    try:
+        browser.get(web_url)
+        s = browser.page_source
+        # s = re.sub(r'<div class="tip tip_4 aimg_tip">.*?</div>', '', s, flags=re.I | re.M)
+        soup = BeautifulSoup(s, 'lxml')
+        if url_type ==2:
+            hostloc_content = soup.find_all("div", class_="pcb")[0]
+        else:
+            hostloc_content = soup.find_all("td", class_="t_f")[0]
+        for tip in hostloc_content.find_all("div", class_="tip_4"):
+            tip.decompose()
+        img_list = hostloc_content.find_all("img", class_="zoom")
+        # 遍历页面中的所有图片元素，将图片替换为 Markdown 格式
+        for img in img_list:
+            # 获取图片的 URL 地址
+            try:
+                if img['zoomfile']:
+                    img_url = img['zoomfile']
+                elif img['file']:
+                    img_url = img['file']
+                else:
+                    img_url = img['src']
+            except Exception as e:
+                print(e)
+                img_url = img['src']
+            # 将 img 元素替换为 Markdown 的图片语法
+            markdown_img = "[图片](" + img_url + ")"
+            img.replace_with(markdown_img)
+        # 遍历页面中所有的附件元素
+        for link in hostloc_content.find_all('a'):
+            print(link.get_text())
+            if link.name == 'a' and (link.get_text().endswith('.rar') or link.get_text().endswith('.7z') or link.get_text().endswith('.zip')):
+                # 获取附件的 URL 地址
+                link_url = mianfan_url + "/"+ link['href']
+                # 将 a 元素替换为 Markdown 的附件语法
+                markdown_link = "[" + link.get_text() + "](" + link_url + ")"       
+                # 将 a 元素替换为 Markdown 的附件语法
+                link.replace_with(markdown_link)
+        for em in hostloc_content.find_all("em", class_="xg1"):
+            em.decompose()
+        contests = hostloc_content.text
+        contests= contests.replace("\r\n", '').replace('\n', '').replace('\xa0', '').replace('\u200b', '')
+        findal = re.findall(r'本帖最后由.*编辑', contests)
+        if findal:
+            contests = contests.replace(findal[0], "").lstrip()
 
-    #             if len(hostloc_content) <= 0:
-    #                 return "因权限原因，内容无法预览，请手动登陆查看！"
-    #             else:
-    #                 info = hostloc_content.xpath('string(.)')
-    #                 findal = re.findall(r'本帖最后由.*编辑', info)
-    #                 if findal:
-    #                     info = info.replace(findal[0], "").lstrip()
-    #                 s = ''
-    #                 for j in info:
-    #                     s = s + j
-    #                 # 不展示全部内容，防止内容过长，严重影响体验
-    #                 return s.replace("\r\n", '').replace('\n', '').replace('\xa0', '').replace('\u200b', '')[0:60]
-    #         except Exception as e:
-    #             print("网络原因，无法访问，请稍后再试...")
-    #             return "因权限原因，内容无法预览，请手动登陆查看！"
-    # else:
-    while True:
-        try:
-            browser.get(web_url)
-            s = browser.page_source
-            # hostloc_content = etree.HTML(s).xpath('//td[@class="t_f"]/text()')
-            hostloc_content = etree.HTML(s).xpath('//td[@class="t_f"]')[0]
-            if len(hostloc_content) <= 0:
-                return "因权限原因，内容无法预览，请手动登陆查看！"
-            else:
-                info = hostloc_content.xpath('string(.)')
-                findal = re.findall(r'本帖最后由.*编辑', info)
-                if findal:
-                    info = info.replace(findal[0], "").lstrip()
-                s = ''
-                for j in info:
-                    s = s + j
-                # 不展示全部内容，防止内容过长，严重影响体验
-                content = s.replace("\r\n", '').replace('\n', '').replace('\xa0', '').replace('\u200b', '')
-                return content[0:60],content[0:200]
-        except Exception as e:
-            print("网络原因，无法访问，请稍后再试...")
-            return "因权限原因，内容无法预览，请手动登陆查看！"
+        pattern = r"\[图片\]\(.*?\)"
+        # 用一个占位符替换[图片](url)
+        placeholder = "#图"
+        # 用一个列表来存储所有的[图片](url)
+        images = re.findall(pattern, contests)
+        # 用一个循环来替换所有的[图片](url)
+        contests2 = contests
+        for image in images:
+            contests = contests.replace(image, placeholder, 1)
+        contests= contests[0:100]
+        if contests.endswith("#"):
+            contests+"图"
+        contests = mark_down(contests)
+        contests = contests.replace("""\#图""","#图 ")
+        for image in images:
+            contests = contests.replace(placeholder, image, 1)
+        return contests, contests2
+    except Exception as e:
+        print(e)
+        print("网络原因，无法访问，请稍后再试...")
+        return "因权限原因，内容无法预览，请手动登陆查看！"
 
 
 def mark_down(content):
     # 删除特殊符号，防止发生错误parse
     sign = ['&', '<', ".", '>', '?', '#', '%', '!', '@', '$', '^', '*', '(', ')', '-', '_', '+', '=',
-            '~', '/', ',', ':', '’', '‘', '^', '{', '}', '*', '[', ']', '`', "'"]
+            '~', '/', ',', ':', '’', '‘', '^', '{', '}', '*', '[', ']', '`', "'","|"]
     content = content.replace("\n", "")
     content = content.strip()
     for k in sign:
@@ -114,9 +135,10 @@ def post(chat_id: str, text: str, silent: bool = False, num=0):
 
 
 # 主程序
-def master(r):
-    global nums 
+def master(r,url_type=1):
+    global t1 
     global mianfan_url
+    global mianfan_url2
     xml_content = etree.HTML(r)
     href_list = xml_content.xpath('/html/body/div[6]/div[6]/div/div/div[4]/div[2]/form/table/tbody/tr/th/a[2]/@href')
     author = xml_content.xpath('/html/body/div[6]/div[6]/div/div/div[4]/div[2]/form/table/tbody/tr/td[2]/cite/a/text()')
@@ -127,14 +149,12 @@ def master(r):
     href_2 = xml_content.xpath('/html/body/div[6]/div[6]/div/div/div[4]/div[2]/form/table/tbody/tr/th/a[3]/text()')
     # print(author)
     # print(number)
-    # 不用那么多数据
     tie_list2 = tie_list[-300:]
     have_new = 0
     for i in range(len(number)):
-        nums +=1
-        if nums >= 1000:
-            mianfan_url = get_mianfan()
-            nums = 0
+        if time.time() - t1 >= 86400:
+            mianfan_url,mianfan_url2 = get_mianfan()
+            t1 = time.time()
         href_id = href_list[i].split("tid=", )[-1].split("&", )[0]
         if not re.match(r'^\d+$', href_id):
             continue
@@ -156,25 +176,31 @@ def master(r):
             # 作者id链接
             url_author = url_1 + "{}".format(author_url[i])
             uid = author_url[i].split(".")[0].split("-")[-1]
-            content_2, content_3 = get_content(url_list)
+            content_2, content_3 = get_content(url_list,url_type)
             mian_url = url_list.replace("https://www.sehuatang.net",mianfan_url)
+            mian_url2 = url_list.replace("https://www.sehuatang.net",mianfan_url2)
             
             text = '\\[ 主        题 \\] ：' + "***{}***".format(
                 mark_down(name)) + '\n' + '[{0}]       [{1}]({2})'.format(mark_down("#U"+uid),
                 mark_down(author[i]),
-                url_author) + '\n' + '\\[ 地        址 \\] ：[{0}]({1})       [{2}]({3})'.format(str(href_id),
-                                                                               url_list,"免翻地址",mian_url) + '\n' + '\\[ 内        容 ' \
-                                                                                                  '\\] ：[{}]'.format(
-                mark_down(content_2))
+                url_author) + '\n' + '\\[ 地        址 \\] ：[{0}]({1})     [{2}]({3})     [{4}]({5})'.format(str(href_id),
+                                                                               url_list,"免翻地址",mian_url,"免翻地址2",mian_url2) + '\n' + '\\[ 内        容 ' \
+                                                                                                  '\\] ：[ {} ]'.format(
+                content_2)
             # print(text)
-            post(pid, text)
+            if url_type == 2:
+                post(pid2, text)
+            else:
+                post(pid, text)
             try:
+                insert_db(mark_down2(author[i]), url_list, mark_down2(name), mark_down2(content_3))
                 insert_db2(mark_down2(author[i]), url_list, mark_down2(name), mark_down2(content_3))
             except:
                 print("插入失败")
                 pass
         else:
             pass
+        time.sleep(random.randint(5, 8))
     if have_new == 1:
         add_list(tie_list[-300:])
 
@@ -274,19 +300,47 @@ c_options.add_argument('--headless')
 c_options.add_argument('--disable-gpu')
 browser = webdriver.Chrome(service=c_service, options=c_options)
 
-def get_mianfan():
-    link = "https://nux4n.cn/config.js"
-    browser.get(link)
-    # print(f.text)
-    pattern = r"home_url\s*=\s*'([^']+)'"
-    match = re.search(pattern, browser.page_source)
-    if match:
-        home_url = match.group(1)
-        return home_url
-    else:
-        return "https://www.dkxs12.com"
-nums = 0
-mianfan_url = get_mianfan()
+def get_mianfan(mian_num=0):
+    mian_url1 = "https://www.dkxs12.com"
+    mian_url2 = "www.xj4sds.com"
+    try:
+        link = "https://nux4n.cn/config.js"
+        browser.get(link)
+        # print(f.text)
+        pattern = r"home_url\s*=\s*'([^']+)'"
+        pattern2 = r"share_url\s*=\s*'([^']+)'"
+        match = re.search(pattern, browser.page_source)
+        match2 = re.search(pattern2, browser.page_source)
+        if match:
+            mian_url1 = match.group(1)
+            mian_url1 = mian_url1.rstrip('/')
+        else:
+            mian_url1 = "https://www.dkxs12.com"
+        if match2:
+            try:
+                share_url = match2.group(1)
+                browser.get(share_url)
+                time.sleep(20)
+                url2 = browser.current_url
+                mian_url2 = url2.replace("/?iframe=ios","")
+            except Exception as e:
+                print(e)
+                mian_url2 = "www.xj4sds.com"
+        else:
+            mian_url2 = "www.xj4sds.com"
+    except Exception as e:
+        print(e)
+        if mian_num > 10:
+            mian_url1 = "https://www.dkxs12.com"
+            mian_url2 = "www.xj4sds.com"
+            return mian_url1,mian_url2
+        else:
+            mian_num += 1
+        time.sleep(3)
+        get_mianfan(mian_num)
+    return mian_url1,mian_url2
+t1 = time.time()
+mianfan_url,mianfan_url2 = get_mianfan()
 
 # 网站的验证
 browser.get(url_1)
@@ -295,6 +349,7 @@ browser.find_element(By.XPATH,'/html/body/a[1]').click()
 form_type = '1'
 while True:
     try:
+        url_type = 1
         if form_type == "1":
             print("综合区")
             url_sehua = url_1 + "forum.php?mod=forumdisplay&fid=95&filter=author&orderby=dateline"
@@ -303,6 +358,10 @@ while True:
             print("原创区")
             url_sehua = url_1 + "forum.php?mod=forumdisplay&fid=141&filter=author&orderby=dateline"
             form_type = "1"
+            # case 3:
+            #     print("AI区")
+            #     url_sehua = url_1 + "forum.php?mod=forumdisplay&fid=166&filter=author&orderby=dateline"
+            #     url_type = 2
         # # 网站不要求js验
         # r = requests.get(url_sehua, headers=headers)
         # xml_content = etree.HTML(r.content)
@@ -318,7 +377,7 @@ while True:
         print("js验证")
         # 网址
         browser.get(url_sehua)
-        master(browser.page_source)
+        master(browser.page_source,url_type)
         # browser.quit()
         # c_service.stop()
         time.sleep(random.randint(times, timed))
