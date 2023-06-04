@@ -191,7 +191,7 @@ def master(r,url_type=1):
             
             post(pid, text)
             try:
-                insert_db(mark_down2(author[i]), url_list, mark_down2(name), mark_down2(content_3))
+                insert_db2(mark_down2(author[i]), url_list, mark_down2(name), mark_down2(content_3))
             except:
                 print("插入失败")
                 pass
