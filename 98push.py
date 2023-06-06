@@ -138,7 +138,6 @@ def post(chat_id: str, text: str, silent: bool = False, num=0):
 
 # 主程序
 def master(r,url_type=1):
-    global t1 
     global mianfan_url
     global mianfan_url2
     xml_content = etree.HTML(r)
@@ -155,8 +154,7 @@ def master(r,url_type=1):
     have_new = 0
     for i in range(len(number)):
         if time.time() - t1 >= 86400:
-            mianfan_url,mianfan_url2 = get_mianfan()
-            t1 = time.time()
+            mianfan_url,mianfan_url2 = getmian()
         href_id = href_list[i].split("tid=", )[-1].split("&", )[0]
         if not re.match(r'^\d+$', href_id):
             continue
@@ -299,6 +297,23 @@ c_options.add_argument('--headless')
 c_options.add_argument('--disable-gpu')
 browser = webdriver.Chrome(service=c_service, options=c_options)
 
+t1 =0
+def getmian():
+    global t1
+    if not os.path.exists("./mianfan.json") or (t1 !=0 and time.time() - t1 >=86400):
+        file = open('./mianfan.json', 'w')
+        mianfans ={}
+        mianfans["t1"] = time.time()
+        mianfans["mian_url1"],mianfans["mian_url2"] = get_mianfan()
+        file.write(json.dumps(mianfans))
+        file.close()
+    else:
+        f = open("./mianfan.json", encoding="utf-8")
+        res = f.read()
+        f.close()
+        mianfans = json.loads(res)
+    t1 = mianfans["t1"]
+    return mianfans["mian_url1"],mianfans["mian_url2"]
 def get_mianfan(mian_num=0):
     mian_url1 = "https://www.dkxs12.com"
     mian_url2 = "www.xj4sds.com"
@@ -338,8 +353,8 @@ def get_mianfan(mian_num=0):
         time.sleep(3)
         get_mianfan(mian_num)
     return mian_url1,mian_url2
-t1 = time.time()
-mianfan_url,mianfan_url2 = get_mianfan()
+
+mianfan_url,mianfan_url2 = getmian()
 
 # 网站的验证
 browser.get(url_1)
