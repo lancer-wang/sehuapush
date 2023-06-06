@@ -2,12 +2,14 @@
 # 自行百度安装chrome和chromedriver
 # 配置文件中分别添加机器人的bot token（从bot father获取）和 频道id（格式为-100 后面跟频道信息中的id）
 # 注意修改底部的chromedriver路径
-import json,sqlite3
+import datetime
+import json
 import os
 import random
 import re
+import sqlite3
 import time
-
+from bs4 import BeautifulSoup
 import requests
 from lxml import etree
 from selenium import webdriver
