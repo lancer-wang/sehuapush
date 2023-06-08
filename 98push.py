@@ -140,14 +140,15 @@ def post(chat_id: str, text: str, silent: bool = False, num=0):
 def master(r,url_type=1):
     global mianfan_url
     global mianfan_url2
+    global tie_list
     xml_content = etree.HTML(r)
-    href_list = xml_content.xpath('/html/body/div[6]/div[6]/div/div/div[4]/div[2]/form/table/tbody/tr/th/a[2]/@href')
-    author = xml_content.xpath('/html/body/div[6]/div[6]/div/div/div[4]/div[2]/form/table/tbody/tr/td[2]/cite/a/text()')
-    author_url = xml_content.xpath(
-        '/html/body/div[6]/div[6]/div/div/div[4]/div[2]/form/table/tbody/tr/td[2]/cite/a/@href')
-    number = xml_content.xpath('/html/body/div[6]/div[6]/div/div/div[4]/div[2]/form/table/tbody/tr/td[3]/a/text()')
-    href = xml_content.xpath('/html/body/div[6]/div[6]/div/div/div[4]/div[2]/form/table/tbody/tr/th/a[2]/text()')
-    href_2 = xml_content.xpath('/html/body/div[6]/div[6]/div/div/div[4]/div[2]/form/table/tbody/tr/th/a[3]/text()')
+    href_list = xml_content.xpath('/html/body/div['+xpaths+']/div[6]/div/div/div[4]/div[2]/form/table/tbody/tr/th/a[2]/@href')
+    author = xml_content.xpath('/html/body/div['+xpaths+']/div[6]/div/div/div[4]/div[2]/form/table/tbody/tr/td[2]/cite/a/text()')
+    author_url = xml_content.xpath('/html/body/div['+xpaths+']/div[6]/div/div/div[4]/div[2]/form/table/tbody/tr/td[2]/cite/a/@href')
+    number = xml_content.xpath('/html/body/div['+xpaths+']/div[6]/div/div/div[4]/div[2]/form/table/tbody/tr/td[3]/a/text()')
+    href = xml_content.xpath('/html/body/div['+xpaths+']/div[6]/div/div/div[4]/div[2]/form/table/tbody/tr/th/a[2]/text()')
+    href_2 = xml_content.xpath('/html/body/div['+xpaths+']/div[6]/div/div/div[4]/div[2]/form/table/tbody/tr/th/a[3]/text()')
+    tie_list2 = tie_list[-300:]
     # print(author)
     # print(number)
     tie_list2 = tie_list[-300:]
@@ -199,7 +200,8 @@ def master(r,url_type=1):
             pass
         time.sleep(random.randint(5, 8))
     if have_new == 1:
-        add_list(tie_list[-300:])
+        tie_list = tie_list[-300:]
+        add_list(tie_list)
 
 ## 新增添加到数据库
 def get_db3():
@@ -270,11 +272,11 @@ def get_con():
         if int(config["times"]) >= int(config["timed"]):
             config["times"] = 20
             config["timed"] = 40
-        return str(config["bottoken"]), str(config["pid"]),str(config["executable_path"]),int(config["times"]),int(config["timed"])
+        return str(config["bottoken"]), str(config["pid"]),str(config["executable_path"]),int(config["times"]),int(config["timed"]),str(config["my_usename"]),str(config["my_pass"])
 
 
 # 获取配置
-bottoken, pid ,executable_path,times,timed= get_con()
+bottoken, pid ,executable_path,times,timed,my_usename,my_pass= get_con()
 # 获取已经发送的帖子列表
 tie_list = get_list()
 headers = {
@@ -360,6 +362,17 @@ mianfan_url,mianfan_url2 = getmian()
 browser.get(url_1)
 time.sleep(5)
 browser.find_element(By.XPATH,'/html/body/a[1]').click()
+## 登陆
+time.sleep(5)
+xpaths = 6
+if my_usename !="" and my_pass!="":
+    print("登陆")
+    browser.find_element(By.XPATH,'//*[@id="ls_username"]').send_keys(my_usename)
+    browser.find_element(By.XPATH,'//*[@id="ls_password"]').send_keys(my_pass)
+    time.sleep(5)
+    browser.find_element(By.XPATH,'//*[@id="lsform"]/div/div/table/tbody/tr[2]/td[3]/button').click()
+    time.sleep(5)
+    xpaths = 7
 form_type = '1'
 while True:
     try:
