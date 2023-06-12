@@ -1,6 +1,10 @@
 # sehuapush
 sehua堂的新帖推送
 
+如遇到bug，请直接提issue
+issue只接受bug和建议，其他勿扰
+
+
 update：新增了持久化，存到sqlite3，有需要的下载根目录下的sehua.db自行查看
 
 2023-5-13 ： 新增自动获取免翻地址
