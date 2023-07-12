@@ -1,16 +1,24 @@
 # sehuapush
 sehua堂的新帖推送
 
+本人py能力一般，代码只能说凑合用
+反正能跑，也不收钱
+
 如遇到bug，请直接提issue
+欢迎欢迎欢迎提pr
 issue只接受bug和建议，其他勿扰
 
 
-update：新增了持久化，存到sqlite3，有需要的下载根目录下的sehua.db自行查看
+update:
 
-2023-5-13 ： 新增自动获取免翻地址
+2023-07-12:不再使用selenium，改为playwright,只能说安装简单了不少, 大概一段时间内不会再有什么大的更新
 
 2023-6-8 :  这两天发现多了很多权限贴，我就弄了下登陆，发现98堂登陆之后页面的xpath居然会变，无语
             理论上登陆应该有个验证是否登陆成功的，不过我也懒得弄了，凑合着用吧,反正其实也用处不大
+
+2023-5-13 : 新增自动获取免翻地址
+2023 未知日期 :新增了持久化，存到sqlite3，有需要的下载根目录下的sehua.db自行查看
+
 
 推荐使用Ubuntu20，因为我用的是ubuntu20，我个人使用是没有问题的
 
@@ -26,16 +34,15 @@ warning ！！！！
 
 
 以下是配置环境
-安装环境，需要python3+chrome+chromedriver
+安装环境，需要python3
 
 1. python3 使用服务器自带或者装个3.6以上应该都可，安装方式自行百度
 
 2. 如果服务器已经有pip，直接pip install -r requirements.txt 
     如果没有，请先百度/谷歌 “服务器名称+如何安装pip”
 
-3. 使用百度/谷歌搜索 “服务器名称” + 安装chrome和chromedriver，如 ubuntu20 安装chromedriver
-    注意chrome和chromedriver都需要安装，教程基本都比较详细，本人不多赘述。
-    安装完chromedriver后把地址填入98.json
+3.  安装完毕之后，在命令行输入 `playwright install` 
+    用以安装playwright环境
 
 4. 脚本需要在后台运行，所以需要使用screen 或者nohup
     墙裂推荐使用screen，安装、使用方法百度/谷歌，一般都是一行代码
