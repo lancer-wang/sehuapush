@@ -406,7 +406,7 @@ def main():
             page.fill('xpath=//*[@id="ls_username"]',my_usename)
             page.fill('xpath=//*[@id="ls_password"]', my_pass)
             time.sleep(5)
-            page.click('//*[@id="lsform"]/div/div/table/tbody/tr[2]/td[3]/button')
+            page.click('xpath=//*[@id="lsform"]/div/div/table/tbody/tr[2]/td[3]/button')
             time.sleep(5)
             xpaths = "7"
         form_type = 3
