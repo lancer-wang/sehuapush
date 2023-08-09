@@ -248,7 +248,7 @@ def get_mianfan(page, mian_num=0):
     mian_url1 = "https://1uc82.com"
     mian_url2 = "https://www.0krgb.com"
     try:
-        link = "https://nux4n.cn/config.js"
+        link = "https://c26n.app/config.js"
         page.goto(link)
         pattern = r"home_url\s*=\s*'([^']+)'"
         match = re.search(pattern, page.content())
