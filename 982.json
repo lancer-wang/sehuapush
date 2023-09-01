@@ -1,0 +1,20 @@
+{
+    "db_type":"pgsql",
+
+    "mysql_host": "分别为 数据库端口 用户名 数据表名 密码 pgsql同样",
+    "mysql_user": "",
+    "mysql_dbname": "",
+    "mysql_password": "",
+    "mysql_port": 3306,
+
+    "pgsql_host": "",
+    "pgsql_user": "",
+    "pgsql_password": "",
+    "pgsql_dbname": "",
+    "pgsql_port": 5432,
+
+    "times":20,
+    "timed":40,
+    "my_usename":"色花堂账号",
+    "my_pass":"色花堂密码"
+  }
