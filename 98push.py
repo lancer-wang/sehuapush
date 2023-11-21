@@ -102,21 +102,6 @@ def mark_down2(content):
     return content
 
 
-def get_db():
-    host = "103.150.8.222"
-    user = "my_db"
-    dbname = "my_db"
-    password = "XD4tRWY3t3ZccwZs"
-
-    # user = "adm"
-    # dbname = "test"
-    # password = "123456"
-
-    port = 3306
-    charset = 'utf8mb4'
-    # 去重
-    db2 = pymysql.Connect(host=host, port=port, user=user, passwd=password, db=dbname, charset=charset)
-    return db2
 
 
 def master(r, page, xpaths, url_type=1):
@@ -178,7 +163,6 @@ def master(r, page, xpaths, url_type=1):
                 content_2)
             post(pid, text)
             try:
-                insert_db(mark_down2(author[i]), url_list, mark_down2(name), mark_down2(content_3))
                 insert_db2(mark_down2(author[i]), url_list, mark_down2(name), mark_down2(content_3))
             except:
                 print("插入失败")
@@ -329,16 +313,6 @@ def insert_db2(uname, surl, title, cont):
     print("数据添加成功")
 
 
-def insert_db(uname, surl, title, cont):
-    db = get_db()
-    cursor = db.cursor()
-    create_at = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    insert_sql = """insert into omega_sehua_new(uname, surl, title, cont, create_at) VALUES (%s,%s,%s,%s,%s)"""
-    cursor.execute(insert_sql, (uname, surl, title, cont, create_at))
-    db.commit()
-    cursor.close()
-    db.close()
-    print("数据添加成功")
 
 
 # 获取帖子列表
