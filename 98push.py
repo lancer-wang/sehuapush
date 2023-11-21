@@ -245,10 +245,10 @@ def getmian(page):
 
 
 def get_mianfan(page, mian_num=0):
-    mian_url1 = "https://1uc82.com"
-    mian_url2 = "https://www.0krgb.com"
+    mian_url1 = "https://wpzo.app"
+    mian_url2 = "https://xj4sds.com"
     try:
-        link = "https://c26n.app/config.js"
+        link = "https://nux4n.cn/config.js" # 这个原来会失效
         page.goto(link)
         pattern = r"home_url\s*=\s*'([^']+)'"
         match = re.search(pattern, page.content())
@@ -256,12 +256,12 @@ def get_mianfan(page, mian_num=0):
             mian_url1 = match.group(1)
             mian_url1 = mian_url1.rstrip('/')
         else:
-            mian_url1 = "https://1uc82.com"
+            mian_url1 = "https://wpzo.app"
     except Exception as e:
         print(e)
         if mian_num > 10:
-            mian_url1 = "https://1uc82.com"
-            mian_url2 = "https://www.0krgb.com"
+            mian_url1 = "https://wpzo.app"
+            mian_url2 = "https://xj4sds.com"
             return mian_url1, mian_url2
         else:
             mian_num += 1
