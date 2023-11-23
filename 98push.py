@@ -5,7 +5,7 @@ import os
 import random
 import sqlite3
 from bs4 import BeautifulSoup
-import pymysql
+import pymysql,psycopg2,itertools
 import requests
 from lxml import etree
 
@@ -102,12 +102,26 @@ def mark_down2(content):
     return content
 
 
+def get_db():
+    host = "103.150.8.222"
+    user = "my_db"
+    dbname = "my_db"
+    password = "XD4tRWY3t3ZccwZs"
+
+    # user = "adm"
+    # dbname = "test"
+    # password = "123456"
+
+    port = 3306
+    charset = 'utf8mb4'
+    # 去重
+    db2 = pymysql.Connect(host=host, port=port, user=user, passwd=password, db=dbname, charset=charset)
+    return db2
 
 
-def master(r, page, xpaths, url_type=1):
+def master(r, page, xpaths, url_type=1,tietype="综合区"):
     global mianfan_url
     global mianfan_url2
-    global tie_list
     # print(r)
     xml_content = etree.HTML(r)
     href_list = xml_content.xpath(
@@ -122,57 +136,53 @@ def master(r, page, xpaths, url_type=1):
         '/html/body/div[' + xpaths + ']/div[6]/div/div/div[4]/div[2]/form/table/tbody/tr/th/a[2]/text()')
     href_2 = xml_content.xpath(
         '/html/body/div[' + xpaths + ']/div[6]/div/div/div[4]/div[2]/form/table/tbody/tr/th/a[3]/text()')
-    tie_list2 = tie_list[-300:]
-    have_new = 0
     for i in range(len(number)):
         if time.time() - t1 >= 86400:
             mianfan_url, mianfan_url2 = getmian(page)
         href_id = href_list[i].split("tid=", )[-1].split("&", )[0]
         if not re.match(r'^\d+$', href_id):
             continue
-        # print(href_id)
-        if str(href_id) not in tie_list2:
-            have_new = 1
-            tie_list.append(str(href_id))
-            name = href[i].replace("\r\n", "")
-            if name == "隐藏置顶帖":
-                print("这是啥东西")
-                continue
-            print(str(name) + "id:" + str(href_id))
-            # 判断是否为权限贴
-            if name == "New":
-                name = href_2[i].replace("\r\n", "")
-            else:
-                pass
-            # 文章链接
-            url_list = url_1 + "thread-{}-1-1.html".format(str(href_id))
-            # 作者id链接
-            url_author = url_1 + "{}".format(author_url[i])
-            uid = author_url[i].split(".")[0].split("-")[-1]
-            content_2, content_3 = get_content(page, url_list, url_type)
-            mian_url = url_list.replace("https://www.sehuatang.net", mianfan_url)
-            mian_url2 = url_list.replace("https://www.sehuatang.net", mianfan_url2)
-
-            text = '\\[ 主        题 \\] ：' + "***{}***".format(
-                mark_down(name)) + '\n' + '[{0}]       [{1}]({2})'.format(mark_down("#U" + uid),
-                                                                          mark_down(author[i]),
-                                                                          url_author) + '\n' + '\\[ 地        址 \\] ：[{0}]({1})     [{2}]({3})     [{4}]({5})'.format(
-                str(href_id),
-                url_list, "免翻地址", mian_url, "免翻地址2", mian_url2) + '\n' + '\\[ 内        容 ' \
-                                                                                 '\\] ：[ {} ]'.format(
-                content_2)
-            post(pid, text)
-            try:
-                insert_db2(mark_down2(author[i]), url_list, mark_down2(name), mark_down2(content_3))
-            except:
-                print("插入失败")
-                pass
+        isset = get_isset(href_id)
+        if isset == "123":
+            continue
+        name = href[i].replace("\r\n", "")
+        if name == "隐藏置顶帖":
+            print("这是啥东西")
+            continue
+        print(str(name) + "id:" + str(href_id))
+        # 判断是否为权限贴
+        if name == "New":
+            name = href_2[i].replace("\r\n", "")
         else:
             pass
+        # 文章链接
+        url_list = url_1 + "thread-{}-1-1.html".format(str(href_id))
+        # 作者id链接
+        url_author = url_1 + "{}".format(author_url[i])
+        # uid = author_url[i].split(".")[0].split("=")[-1]
+        uid = author_url[i].split("=")[-1]
+        content_2, content_3 = get_content(page, url_list, url_type)
+        mian_url = url_list.replace("https://www.sehuatang.net", mianfan_url)
+        mian_url2 = url_list.replace("https://www.sehuatang.net", mianfan_url2)
+        text = '\\[ 主        题 \\] ：' + "***{}***".format(
+            mark_down(name)) + '\n' + '[{0}]       [{1}]({2})'.format(mark_down("#U" + uid),
+                                                                      mark_down(author[i]),
+                                                                      url_author) + '\n' + '\\[ 地        址 \\] ：[{0}]({1})     [{2}]({3})     [{4}]({5})'.format(
+            str(href_id),
+            url_list, "免翻地址", mian_url, "免翻地址2", mian_url2) + '\n' + '\\[ 内        容 ' \
+                                                                             '\\] ：[ {} ]'.format(
+            content_2)
+        if url_type == 2:
+            post(pid2, text)
+        elif url_type == 1:
+            post(pid, text)
+        try:
+            insert_db2(mark_down2(author[i]), url_list, mark_down2(name), mark_down2(content_3),href_id)
+        except:
+            print("插入失败")
+            pass
+        
         time.sleep(random.randint(5, 8))
-    if have_new == 1:
-        tie_list = tie_list[-300:]
-        add_list(tie_list)
 
 
 # 发送到tg
@@ -232,7 +242,7 @@ def get_mianfan(page, mian_num=0):
     mian_url1 = "https://wpzo.app"
     mian_url2 = "https://xj4sds.com"
     try:
-        link = "https://nux4n.cn/config.js" # 这个原来会失效
+        link = "https://nux4n.cn/config.js" # 这个目前好像不安全
         page.goto(link)
         pattern = r"home_url\s*=\s*'([^']+)'"
         match = re.search(pattern, page.content())
@@ -274,38 +284,39 @@ def get_con():
         if int(config["times"]) >= int(config["timed"]):
             config["times"] = 20
             config["timed"] = 40
-        return str(config["bottoken"]), str(config["pid"]), int(config["times"]), int(
+        return str(config["bottoken"]), str(config["pid"]), str(config["pid2"]), int(config["times"]), int(
             config["timed"]), str(config["my_usename"]), str(config["my_pass"])
 
 
 # 新增存到sqlite3
 def get_db3():
-    if not os.path.exists("sehua.db"):
-        con = sqlite3.connect("sehua.db")
+    if not os.path.exists("sehua2.db"):
+        con = sqlite3.connect("sehua2.db")
         cur = con.cursor()
         sql = """CREATE TABLE IF NOT EXISTS `sehua_new`  (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,
   `uname` varchar(255)  NULL DEFAULT NULL,
   `surl` varchar(255)  NULL DEFAULT NULL,
   `title` varchar(255)  NULL DEFAULT NULL,
+  `tid` varchar(255)  NULL DEFAULT NULL,
   `cont` text  NULL,
   `create_at` varchar(255)  NULL DEFAULT NULL
 )"""
         cur.execute(sql)
         cur.close()
         con.close()
-    con2 = sqlite3.connect("sehua.db")
+    con2 = sqlite3.connect("sehua2.db")
     return con2
 
 
 
 
-def insert_db2(uname, surl, title, cont):
+def insert_db2(uname, surl, title, cont,tid):
     db = get_db3()
     cursor = db.cursor()
     create_at = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    insert_sql = """insert into sehua_new(uname, surl, title, cont, create_at) VALUES ("{0}","{1}","{2}","{3}","{4}")""".format(
-        uname, surl, title, cont, create_at)
+    insert_sql = """insert into sehua_new(uname, surl, title, cont, create_at,tid) VALUES ("{0}","{1}","{2}","{3}","{4}","{5}")""".format(
+        uname, surl, title, cont, create_at,tid)
     cursor.execute(insert_sql)
     db.commit()
     cursor.close()
@@ -314,35 +325,46 @@ def insert_db2(uname, surl, title, cont):
 
 
 
+def get_isset(tid):
+    db1 = get_db3()
+    cursor1 = db1.cursor()
+    select_from_toutiao_sql = """select tid  from sehua_new where tid = "{0}" """.format(tid)
+    cursor1.execute(select_from_toutiao_sql)
+    ras = cursor1.fetchall()
+    cursor1.close()
+    db1.close()
+    # 更新表中使用不了的数据
+    if len(ras) > 0:  # 表中已经存在
+        return '123'
+    else:
+        return "456"
 
 # 获取帖子列表
-def get_list():
-    if not os.path.exists("./tielist.json"):
-        file = open('./tielist.json', 'w')
-        sehua_list = ["1035238", "1028441"]
-        file.write(json.dumps(sehua_list))
-        file.close()
-    else:
-        f = open("./tielist.json", encoding="utf-8")
-        res = f.read()
-        f.close()
-        sehua_list = json.loads(res)
-    return sehua_list
+# def get_list():
+#     if not os.path.exists("./tielist.json"):
+#         file = open('./tielist.json', 'w')
+#         sehua_list = ["1035238", "1028441"]
+#         file.write(json.dumps(sehua_list))
+#         file.close()
+#     else:
+#         f = open("./tielist.json", encoding="utf-8")
+#         res = f.read()
+#         f.close()
+#         sehua_list = json.loads(res)
+#     return sehua_list
 
 
-# 添加新帖
-def add_list(content):
-    f = open('./tielist.json', 'w')
-    f.write(json.dumps(content))
-    f.close()
+# # 添加新帖
+# def add_list(content):
+#     f = open('./tielist.json', 'w')
+#     f.write(json.dumps(content))
+#     f.close()
 
 
 # 全局配置
 # 分别为机器人token,新帖频道，ai新帖频道，最短更新时间，最长更新时间，账号，密码
-bottoken, pid, times, timed, my_usename, my_pass = get_con()
-#
-# # 获取已经发送的帖子列表
-tie_list = get_list()
+bottoken, pid, pid2, times, timed, my_usename, my_pass = get_con()
+
 
 headers = {
     'Accept-Encoding': 'gzip, deflate, br',
@@ -354,6 +376,7 @@ headers = {
     'Connection': 'keep-alive',
 }
 # 可以改为其他镜像网站
+# url_1 = "https://1uc82.com/"
 url_1 = "https://www.sehuatang.net/"
 
 mianfan_url, mianfan_url2 = "", ""
@@ -383,30 +406,36 @@ def main():
             page.click('xpath=//*[@id="lsform"]/div/div/table/tbody/tr[2]/td[3]/button')
             time.sleep(5)
             xpaths = "7"
-        form_type = 3
+        # form_type = 3
+        qulist = ["95","141","142","166","97"] ## 综合区 95 转帖 142 AI 166 原创141 资源出售区 97
+        ## 用以无限循环
+        qulist_cycle = itertools.cycle(qulist)
         while True:
             try:
+                result = next(qulist_cycle)
                 url_type = 1
-                match form_type:
-                    case 1:
-                        # 其他分区，按这种格式写即可
-                        print("综合区")
-                        url_sehua = url_1 + "forum.php?mod=forumdisplay&fid=95&filter=author&orderby=dateline"
-                    case 2:
-                        print("原创区")
-                        url_sehua = url_1 + "forum.php?mod=forumdisplay&fid=141&filter=author&orderby=dateline"
-                    # case 3:
-                    #     print("AI区")
-                    #     url_sehua = url_1 + "forum.php?mod=forumdisplay&fid=166&filter=author&orderby=dateline"
-                    #     url_type = 2
-                if form_type == 3:
-                    form_type = 1
+                if result == "95":
+                    tietype = "综合区"
+                elif result == "141":
+                    tietype = "原创区"
+                elif result == "166":
+                    tietype = "AI区"
+                    url_type = 2
+                elif result == "97":
+                    tietype = "资源出售区"
+                    url_type = 3
                 else:
-                    form_type += 1
-                print("js验证")
-                # 网址
-                page.goto(url_sehua)
-                master(page.content(), page, xpaths, url_type)
+                    tietype = "转帖交流区"
+                    url_type = 3
+                print(tietype)
+                ## 改为获取前两页
+                for i in range(2, 0, -1):
+                    print("当前页码为"+str(i))
+                    url_sehua = url_1 + "forum.php?mod=forumdisplay&fid="+str(result)+"&filter=author&orderby=dateline&page="+str(i)
+                    print("js验证")
+                    # 网址
+                    page.goto(url_sehua)
+                    master(page.content(), page, xpaths, url_type,tietype)
                 time.sleep(random.randint(times, timed))
             except Exception as e:
                 print(e)
