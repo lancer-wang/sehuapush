@@ -12,7 +12,6 @@ from lxml import etree
 from playwright.sync_api import sync_playwright
 import time
 
-
 # 获取综合区等的内容
 def get_content(page, web_url, url_type=1):
     try:
@@ -79,6 +78,37 @@ def get_content(page, web_url, url_type=1):
     except Exception as e:
         print(e)
         print("网络原因，无法访问，请稍后再试...")
+        return "因权限或网络等原因，内容无法预览，请手动登陆查看！", "因权限或网络等原因，内容无法预览，请手动登陆查看！"
+    
+def get_content(page, web_url, url_type=1):
+    try:
+        page.goto(web_url)
+        s = page.content()
+        soup = BeautifulSoup(s, 'lxml')
+        hostloc_content = soup.find_all("div", class_="pcb")[0] if url_type == 2 else soup.find_all("td", class_="t_f")[0]
+        for tip in hostloc_content.find_all("div", class_="tip_4"):
+            tip.decompose()
+        img_list = hostloc_content.find_all("img", class_="zoom")
+        for img in img_list:
+            img_url = img.attrs.get('zoomfile') or img.attrs.get('file') or img.attrs.get('src') or ""
+            markdown_img = f"[图片]({img_url})"
+            img.replace_with(markdown_img)
+        for em in hostloc_content.find_all("em", class_="xg1"):
+            em.decompose()
+        contests = re.sub(r'本帖最后由.*编辑', '', hostloc_content.text)
+        contests = re.sub(r'[\r\n\xa0\u200b]+', '', contests)
+        pattern = r"\[图片\]\(.*?\)"
+        placeholder = "#图"
+        images = re.findall(pattern, contests)
+        for image in images:
+            contests = contests.replace(image, placeholder, 1)
+        contests3 = mark_down(contests[:100].rstrip() + "图", ["#"])
+        contests3 = contests3.replace(f"{placeholder} ", "").replace(placeholder, images.pop(0), 1) if images else contests3
+        for image in images:
+            contests3 = contests3.replace(placeholder, image, 1)
+        return contests3, contests
+    except Exception as e:
+        print(e)
         return "因权限或网络等原因，内容无法预览，请手动登陆查看！", "因权限或网络等原因，内容无法预览，请手动登陆查看！"
 
 
@@ -223,26 +253,31 @@ def get_mianfan(page, mian_num=0):
 
 # 获取配置
 def get_con():
+    # Check if the config file exists
     if not os.path.exists("./98.json"):
         print("缺少配置文件")
         exit()
-    else:
-        f = open("./98.json", encoding="utf-8")
-        res = f.read()
-        f.close()
-        config = json.loads(res)
-        if config["bottoken"] == "机器人token" or config["pid"] == "-100后面跟你的频道id":
-            print("请填写配置文件")
-            exit()
-        if not re.match(r'^\d+$', str(config["times"])):
-            config["times"] = 20
-        if not re.match(r'^\d+$', str(config["timed"])):
-            config["timed"] = 40
-        if int(config["times"]) >= int(config["timed"]):
-            config["times"] = 20
-            config["timed"] = 40
-        return str(config["bottoken"]), str(config["pid"]), str(config["pid2"]), int(config["times"]), int(
-            config["timed"]), str(config["my_usename"]), str(config["my_pass"])
+
+    # Read and parse the config file
+    with open("./98.json", encoding="utf-8") as f:
+        config = json.load(f)
+
+    # Check if required config values are present
+    if config["bottoken"] == "机器人token" or config["pid"] == "-100后面跟你的频道id":
+        print("请填写配置文件")
+        exit()
+
+    # Sanitize and validate config values
+    config["times"] = int(config.get("times", 20))
+    config["timed"] = int(config.get("timed", 40))
+
+    if config["times"] >= config["timed"]:
+        config["times"] = 20
+        config["timed"] = 40
+
+    # Return relevant config values
+    return str(config["bottoken"]), str(config["pid"]), str(config["pid2"]), config["times"], config["timed"], str(config["my_usename"]), str(config["my_pass"])
+
 
 
 # 新增存到sqlite3
