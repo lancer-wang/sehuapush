@@ -18,7 +18,6 @@ def get_content(page, web_url, url_type=1):
     try:
         page.goto(web_url)
         s = page.content()
-        # s = re.sub(r'<div class="tip tip_4 aimg_tip">.*?</div>', '', s, flags=re.I | re.M)
         soup = BeautifulSoup(s, 'lxml')
         if url_type == 2:
             hostloc_content = soup.find_all("div", class_="pcb")[0]
@@ -101,23 +100,8 @@ def mark_down2(content):
     content = content.strip().replace("\n", "").replace('"', "'")
     return content
 
-
-def get_db():
-    host = "103.150.8.222"
-    user = "my_db"
-    dbname = "my_db"
-    password = "XD4tRWY3t3ZccwZs"
-
-    # user = "adm"
-    # dbname = "test"
-    # password = "123456"
-
-    port = 3306
-    charset = 'utf8mb4'
-    # 去重
-    db2 = pymysql.Connect(host=host, port=port, user=user, passwd=password, db=dbname, charset=charset)
-    return db2
-
+# 是否登陆，在某些网站xpaths会发生变化
+# 如果和我用的网站不同，请根据实际情况自行修改
 
 def master(r, page, xpaths, url_type=1,tietype="综合区"):
     global mianfan_url
@@ -237,10 +221,11 @@ def getmian(page):
     t1 = mianfans["t1"]
     return mianfans["mian_url1"], mianfans["mian_url2"]
 
-
+# 由于某些原因，改为固定
 def get_mianfan(page, mian_num=0):
     mian_url1 = "https://wpzo.app"
     mian_url2 = "https://xj4sds.com"
+    return mian_url1,mian_url2
     try:
         link = "https://nux4n.cn/config.js" # 这个目前好像不安全
         page.goto(link)
@@ -339,26 +324,6 @@ def get_isset(tid):
     else:
         return "456"
 
-# 获取帖子列表
-# def get_list():
-#     if not os.path.exists("./tielist.json"):
-#         file = open('./tielist.json', 'w')
-#         sehua_list = ["1035238", "1028441"]
-#         file.write(json.dumps(sehua_list))
-#         file.close()
-#     else:
-#         f = open("./tielist.json", encoding="utf-8")
-#         res = f.read()
-#         f.close()
-#         sehua_list = json.loads(res)
-#     return sehua_list
-
-
-# # 添加新帖
-# def add_list(content):
-#     f = open('./tielist.json', 'w')
-#     f.write(json.dumps(content))
-#     f.close()
 
 
 # 全局配置
@@ -428,7 +393,7 @@ def main():
                     tietype = "转帖交流区"
                     url_type = 3
                 print(tietype)
-                ## 改为获取前两页
+                ## 改为获取前两页，2改为其他数字就是前x页，注意不要大于1000
                 for i in range(2, 0, -1):
                     print("当前页码为"+str(i))
                     url_sehua = url_1 + "forum.php?mod=forumdisplay&fid="+str(result)+"&filter=author&orderby=dateline&page="+str(i)
