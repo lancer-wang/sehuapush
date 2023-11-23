@@ -104,68 +104,40 @@ def mark_down2(content):
 # 如果和我用的网站不同，请根据实际情况自行修改
 
 def master(r, page, xpaths, url_type=1,tietype="综合区"):
-    global mianfan_url
-    global mianfan_url2
-    # print(r)
+    global mianfan_url, mianfan_url2
     xml_content = etree.HTML(r)
-    href_list = xml_content.xpath(
-        '/html/body/div[' + xpaths + ']/div[6]/div/div/div[4]/div[2]/form/table/tbody/tr/th/a[2]/@href')
-    author = xml_content.xpath(
-        '/html/body/div[' + xpaths + ']/div[6]/div/div/div[4]/div[2]/form/table/tbody/tr/td[2]/cite/a/text()')
-    author_url = xml_content.xpath(
-        '/html/body/div[' + xpaths + ']/div[6]/div/div/div[4]/div[2]/form/table/tbody/tr/td[2]/cite/a/@href')
-    number = xml_content.xpath(
-        '/html/body/div[' + xpaths + ']/div[6]/div/div/div[4]/div[2]/form/table/tbody/tr/td[3]/a/text()')
-    href = xml_content.xpath(
-        '/html/body/div[' + xpaths + ']/div[6]/div/div/div[4]/div[2]/form/table/tbody/tr/th/a[2]/text()')
-    href_2 = xml_content.xpath(
-        '/html/body/div[' + xpaths + ']/div[6]/div/div/div[4]/div[2]/form/table/tbody/tr/th/a[3]/text()')
-    for i in range(len(number)):
-        if time.time() - t1 >= 86400:
-            mianfan_url, mianfan_url2 = getmian(page)
-        href_id = href_list[i].split("tid=", )[-1].split("&", )[0]
+    posts = xml_content.xpath('/html/body/div[{}]/div[6]/div/div/div[4]/div[2]/form/table/tbody/tr'.format(xpaths))
+    for post in posts:
+        link = post.xpath('./th/a[2]')
+        if not link:
+            continue
+        href_list = link[0].xpath('@href')
+        if not href_list:
+            continue
+        href_id = href_list[0].split("tid=", )[-1].split("&", )[0]
         if not re.match(r'^\d+$', href_id):
             continue
-        isset = get_isset(href_id)
-        if isset == "123":
-            continue
-        name = href[i].replace("\r\n", "")
+        name = link[0].xpath('string()').replace("\r\n", "")
         if name == "隐藏置顶帖":
-            print("这是啥东西")
             continue
-        print(str(name) + "id:" + str(href_id))
-        # 判断是否为权限贴
-        if name == "New":
-            name = href_2[i].replace("\r\n", "")
-        else:
-            pass
-        # 文章链接
+        author = post.xpath('./td[2]/cite/a')
+        author_url = author[0].xpath('@href')
+        uid = author_url[0].split("=")[-1]
+        url_author = url_1 + "{}".format(author_url[0])
         url_list = url_1 + "thread-{}-1-1.html".format(str(href_id))
-        # 作者id链接
-        url_author = url_1 + "{}".format(author_url[i])
-        # uid = author_url[i].split(".")[0].split("=")[-1]
-        uid = author_url[i].split("=")[-1]
         content_2, content_3 = get_content(page, url_list, url_type)
         mian_url = url_list.replace("https://www.sehuatang.net", mianfan_url)
         mian_url2 = url_list.replace("https://www.sehuatang.net", mianfan_url2)
-        text = '\\[ 主        题 \\] ：' + "***{}***".format(
-            mark_down(name)) + '\n' + '[{0}]       [{1}]({2})'.format(mark_down("#U" + uid),
-                                                                      mark_down(author[i]),
-                                                                      url_author) + '\n' + '\\[ 地        址 \\] ：[{0}]({1})     [{2}]({3})     [{4}]({5})'.format(
-            str(href_id),
-            url_list, "免翻地址", mian_url, "免翻地址2", mian_url2) + '\n' + '\\[ 内        容 ' \
-                                                                             '\\] ：[ {} ]'.format(
-            content_2)
-        if url_type == 2:
-            post(pid2, text)
-        elif url_type == 1:
-            post(pid, text)
+        text = '[ 主题 ]：***{}***\n[{}] [{}]({})\n[ 地址 ]：[{}]({}) [免翻地址]({}) [免翻地址2]({})\n[ 内容 ]：[ {} ]'.format(
+            mark_down(name), mark_down("#U" + uid), mark_down(author[0].xpath('string()')), url_author, str(href_id),
+            url_list, mian_url, mian_url2, content_2)
         try:
-            insert_db2(mark_down2(author[i]), url_list, mark_down2(name), mark_down2(content_3),href_id)
+            insert_db2(mark_down2(author[0].xpath('string()')), url_list, mark_down2(name), mark_down2(content_3),
+                       href_id)
         except:
-            print("插入失败")
             pass
-        
+        # post either to pid or pid2, depending on url_type
+        post(pid2 if url_type == 2 else pid, text)
         time.sleep(random.randint(5, 8))
 
 
