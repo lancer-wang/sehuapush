@@ -300,6 +300,41 @@ def get_db3():
     con2 = sqlite3.connect("sehua2.db")
     return con2
 
+def insert_db2(uname, surl, title, cont, tid):
+    create_at = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    insert_sql = 'INSERT INTO sehua_new (uname, surl, title, cont, create_at, tid) VALUES (%s, %s, %s, %s, %s, %s)'
+    execute_insert(insert_sql, (uname, surl, title, cont, create_at, tid), '数据添加成功')
+
+def insert_db(uname, surl, title, cont, tietype, tid):
+    create_at = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    insert_sql = 'INSERT INTO omega_sehua_new (uname, surl, title, cont, create_at, tietype, tid) VALUES (%s, %s, %s, %s, %s, %s, %s)'
+    execute_insert(insert_sql, (uname, surl, title, cont, create_at, tietype, tid), '数据添加成功')
+
+def execute_insert(insert_sql, args, success_message):
+    db = get_db3()
+    cursor = db.cursor()
+    cursor.execute(insert_sql, args)
+    db.commit()
+    cursor.close()
+    db.close()
+    print(success_message)
+
+def get_isset(tid):
+    select_from_toutiao_sql = 'SELECT tid FROM sehua_new WHERE tid = %s'
+    results = execute_select(select_from_toutiao_sql, (tid,))
+    if results:
+        return '123'
+    else:
+        return '456'
+
+def execute_select(select_sql, args):
+    db = get_db3()
+    cursor = db.cursor()
+    cursor.execute(select_sql, args)
+    results = cursor.fetchall()
+    cursor.close()
+    db.close()
+    return results
 
 
 
