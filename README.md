@@ -1,4 +1,4 @@
-# sehuapush
+### sehuapush
 sehua堂的新帖推送
 
 
@@ -20,14 +20,14 @@ issue只接受bug和建议，其他勿扰
 
 
 
-todo？ 
+### todo？ 
 
 可能会搞个docker版本
 
 不过单文件弄docker感觉有点用屠龙刀杀鸡
 
 
-update:
+### update:
 
 2023-07-12:不再使用selenium，改为playwright,只能说安装简单了不少, 大概一段时间内不会再有什么大的更新
 
@@ -40,7 +40,7 @@ update:
 
 推荐使用Ubuntu20，因为我用的是ubuntu20，我个人使用是没有问题的
 
-warning ！！！！
+### warning ！！！！
 1. 本脚本需要一定的计算机/服务器基础才可用，而非懒人一键脚本
 
 2. 强烈建议使用外国服务器，国内服务器需配置代理以使用tg的推送
@@ -51,7 +51,7 @@ warning ！！！！
 其他区参考参考进阶2
 
 
-以下是配置环境
+### 配置环境
 安装环境，需要python3
 
 1. python3 使用服务器自带或者装个3.6以上应该都可，安装方式自行百度
@@ -70,7 +70,7 @@ warning ！！！！
     
     ubuntu安装是apt install screen 
 
-以下是使用教程
+### 使用教程
 1. 点击https://t.me/BotFather 创建一个机器人，获取机器人token （创建完会自动发你）
 
 2. 创建一个频道，把刚才创建的机器人拉进群并设为管理员
@@ -84,7 +84,7 @@ warning ！！！！
 
 6. python 98push.py
 
-进阶 
+### 进阶 
 warning2 ！！！
 以下不推荐使用
 
