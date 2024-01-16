@@ -444,6 +444,11 @@ def main():
                     page.goto(url_sehua)
                     master(page.content(), page, xpaths, url_type,tietype)
                 time.sleep(random.randint(times, timed))
+                # 关闭多余标签页
+                print("关闭多余标签页")
+                for page1 in context.pages:
+                    if page1 != page:
+                        page1.close()
             except Exception as e:
                 print(e)
                 print("网络错误，请稍后重试")
